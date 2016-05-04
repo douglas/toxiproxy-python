@@ -1,0 +1,6 @@
+dependencies:
+  override:
+    - ./bin/start-toxiproxy.sh
+test:
+  override:
+    - python setup.py test
