@@ -1,5 +1,7 @@
 [![Circle CI](https://circleci.com/gh/douglas/toxiproxy-python.svg?style=shield)](https://circleci.com/gh/douglas/toxiproxy-python)
 
+[![Build Status](https://travis-ci.org/douglas/toxiproxy-python.svg?branch=master)](https://travis-ci.org/douglas/toxiproxy-python)
+
 # toxiproxy-python (Work in Progress)
 
 `toxiproxy-python` `0.x` (latest) is compatible with the Toxiproxy `2.x` series.
