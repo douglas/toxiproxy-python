@@ -1,7 +1,5 @@
 from test.test_helper import TestCase
-from toxiproxy import VERSION
-
-import six
+from past.builtins import basestring
 
 
 class ToxiproxyTest(TestCase):
@@ -78,12 +76,14 @@ class ToxiproxyTest(TestCase):
         pass
 
     def test_running_helper(self):
-        pass
+        """ Test if the helper is running """
+
+        self.assertTrue(self.proxy.running())
 
     def test_version(self):
         """ Test if the version is an instance of a string type """
 
-        self.assertIsInstance(VERSION, six.string_types)
+        self.assertIsInstance(self.proxy.version(), basestring)
 
     def test_multiple_of_same_toxic_type(self):
         pass
