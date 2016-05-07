@@ -12,13 +12,27 @@ class Intoxicated(object):
     def __init__(self, host, port):
         """ """
 
+        self.host = host
+        self.port = port
         self.base_url = "http://%s:%s" % (host, port)
 
-    def get(self, url):
+    def get(self, url, params=None, **kwargs):
         """ Use the GET method to fetch data from the API """
 
         endpoint = self.base_url + url
-        return validate_response(requests.get(endpoint))
+        return validate_response(requests.get(url=endpoint, params=params, **kwargs))
+
+    def delete(self, url, **kwargs):
+        """ Use the DELETE method to delete data from the API """
+
+        endpoint = self.base_url + url
+        return validate_response(requests.delete(url=endpoint, **kwargs))
+
+    def post(self, url, data=None, json=None, **kwargs):
+        """ Use the POST method to post data to the API """
+
+        endpoint = self.base_url + url
+        return validate_response(requests.post(url=endpoint, data=data, json=json, **kwargs))
 
 
 def validate_response(response):
@@ -35,4 +49,5 @@ def validate_response(response):
         raise_with_traceback(NotFound(content))
     elif response.status_code == 400:
         raise_with_traceback(InvalidToxic(content))
-    return content
+
+    return response
