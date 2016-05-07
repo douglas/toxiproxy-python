@@ -1,9 +1,11 @@
 import unittest
 
+from toxiproxy import Toxiproxy
+
 
 class TestCase(unittest.TestCase):
     def setUp(self):
-        pass
+        self.proxy = Toxiproxy()
 
     def tearDown(self):
         pass
