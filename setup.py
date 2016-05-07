@@ -19,10 +19,12 @@ setup(
     license="MIT License",
     install_requires=[
         "future",
+        "requests"
     ],
     test_suite="test",
     tests_require=[
         "future",
+        "requests"
     ],
     platforms="Any",
     classifiers=[
