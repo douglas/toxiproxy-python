@@ -12,7 +12,34 @@ class ToxiproxyTest(TestCase):
         self.assertEqual(proxy.name, "test_mysql_master")
 
         # Destroy this proxy
+        proxy.destroy()
+
+    def test_destroy_proxy(self):
+        """ Test if we can destroy proxies """
+
+        proxy = self.toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
         self.toxiproxy.destroy(proxy)
+
+        self.assertNotIn(proxy, self.toxiproxy.proxies)
+
+    def test_disable_proxy(self):
+        """ Test if we can disable proxies """
+
+        proxy = self.toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
+        proxy.disable()
+
+        self.assertEqual(proxy.enabled, False)
+        proxy.destroy()
+
+    def test_enable_proxy(self):
+        """ Test if we can enable a proxy """
+
+        proxy = self.toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
+        proxy.disable()
+        proxy.enable()
+
+        self.assertEqual(proxy.enabled, True)
+        proxy.destroy()
 
     def test_create_and_find_proxy(self):
         pass
