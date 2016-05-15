@@ -1,6 +1,8 @@
 from test.test_helper import TestCase
 from past.builtins import basestring
 
+from .exceptions import ProxyExists
+
 
 class ToxiproxyTest(TestCase):
     def test_create_proxy(self):
@@ -42,7 +44,27 @@ class ToxiproxyTest(TestCase):
         proxy.destroy()
 
     def test_create_and_find_proxy(self):
-        pass
+        """ Test if we can create a proxy and retrieve it """
+
+        self.toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
+
+        proxy = self.toxiproxy.get_proxy("test_mysql_master")
+
+        self.assertEqual(proxy.upstream, "localhost:3306")
+        self.assertEqual(proxy.name, "test_mysql_master")
+
+        self.toxiproxy.destroy(proxy)
+
+    def test_cant_create_proxies_same_name(self):
+        """ Test that we can't create proxies with the same name """
+
+        proxy = self.toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
+
+        with self.assertRaises(ProxyExists) as context:
+            self.toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
+            self.assertTrue("This proxy already exists." in context.exception)
+
+        self.toxiproxy.destroy(proxy)
 
     def test_proxy_not_running_with_bad_host(self):
         """ Test if the wrapper can't connect with an invalid toxiproxy server """
