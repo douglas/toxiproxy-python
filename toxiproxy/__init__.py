@@ -3,7 +3,9 @@
 import socket
 
 from contextlib import closing
+from future.utils import raise_with_traceback
 from .api import Intoxicated
+from .exceptions import ProxyExists
 
 
 class Proxy(object):
@@ -62,7 +64,15 @@ class Toxiproxy(object):
         """ Toxiproxy constructor """
 
         self.api_server = Intoxicated(server_host, server_port)
-        self.proxies = []
+        self.proxies = {}
+
+    def get_proxy(self, proxy_name):
+        """ Retrive a proxy if it exists """
+
+        if proxy_name in self.proxies:
+            return self.proxies[proxy_name]
+        else:
+            return None
 
     def running(self):
         """ Test if the toxiproxy server is running """
@@ -88,6 +98,9 @@ class Toxiproxy(object):
     def create(self, upstream, name, listen=None, enabled=None):
         """ Create a toxiproxy proxy """
 
+        if name in self.proxies:
+            raise_with_traceback(ProxyExists("This proxy already exists."))
+
         # Lets build a dictionary to send the data to the Toxiproxy server
         json = {
             "upstream": upstream,
@@ -106,7 +119,7 @@ class Toxiproxy(object):
         proxy = Proxy(**proxy_info)
 
         # Add the new proxy to the toxiproxy proxies collection
-        self.proxies.append(proxy)
+        self.proxies.update({proxy.name: proxy})
 
         return proxy
 
@@ -114,7 +127,7 @@ class Toxiproxy(object):
         """ Delete a toxiproxy proxy """
 
         if proxy.destroy() is True:
-            self.proxies.remove(proxy)
+            del self.proxies[proxy.name]
             return True
         else:
             return False
