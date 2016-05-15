@@ -1,7 +1,7 @@
 from test.test_helper import TestCase
 from past.builtins import basestring
 
-from .exceptions import ProxyExists
+from toxiproxy.exceptions import ProxyExists
 
 
 class ToxiproxyTest(TestCase):
