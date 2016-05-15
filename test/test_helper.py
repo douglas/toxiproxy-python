@@ -25,7 +25,7 @@ class TestCase(unittest.TestCase):
 
 
 @contextmanager
-def tcpserver(receive=False):
+def tcpserver():
     """ Create a simple TCPServer to allows us to test our wrapper """
 
     # Create a TCP/IP socket and bind it
