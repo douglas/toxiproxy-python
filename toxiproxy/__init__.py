@@ -88,7 +88,7 @@ class Toxiproxy(object):
         if self.running() is True:
             return self.api_server.get("/version").content
         else:
-            return False
+            return None
 
     def reset(self):
         """ Re-enables all proxies and disables all toxics. """
@@ -126,7 +126,7 @@ class Toxiproxy(object):
     def destroy(self, proxy):
         """ Delete a toxiproxy proxy """
 
-        if proxy.destroy() is True:
+        if isinstance(proxy, Proxy) and proxy.destroy() is True:
             del self.proxies[proxy.name]
             return True
         else:
