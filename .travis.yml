@@ -8,8 +8,12 @@ python:
 # command to install dependencies
 install:
     - "python setup.py install"
+    - pip install coveralls
 
 # command to run tests
 script:
     - "bin/start-toxiproxy.sh"
     - "python setup.py test"
+
+after_success:
+    coveralls
