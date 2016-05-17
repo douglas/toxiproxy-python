@@ -8,10 +8,17 @@ class ToxiproxyTest(TestCase):
     def test_create_proxy(self):
         """ Test if we can create proxies """
 
-        proxy = self.toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
+        proxy = self.toxiproxy.create(
+            upstream="localhost:3306",
+            name="test_mysql_master",
+            enabled=False,
+            listen="127.0.0.1:43215"
+        )
 
         self.assertEqual(proxy.upstream, "localhost:3306")
         self.assertEqual(proxy.name, "test_mysql_master")
+        self.assertFalse(proxy.enabled)
+        self.assertEqual(proxy.listen, "127.0.0.1:43215")
 
         # Destroy this proxy
         proxy.destroy()
@@ -23,6 +30,12 @@ class ToxiproxyTest(TestCase):
         self.toxiproxy.destroy(proxy)
 
         self.assertNotIn(proxy, self.toxiproxy.proxies)
+
+    def test_destroy_invalid_proxy(self):
+        """ Test if we can destroy an invalid proxy """
+
+        result = self.toxiproxy.destroy("invalid_proxy")
+        self.assertFalse(result)
 
     def test_disable_proxy(self):
         """ Test if we can disable proxies """
@@ -42,6 +55,12 @@ class ToxiproxyTest(TestCase):
 
         self.assertEqual(proxy.enabled, True)
         proxy.destroy()
+
+    def test_find_invalid_proxy(self):
+        """ Test if that we cant fetch an invalid proxy """
+
+        proxy = self.toxiproxy.get_proxy("invalid_proxy")
+        self.assertEqual(proxy, None)
 
     def test_create_and_find_proxy(self):
         """ Test if we can create a proxy and retrieve it """
@@ -66,12 +85,12 @@ class ToxiproxyTest(TestCase):
 
         self.toxiproxy.destroy(proxy)
 
-    def test_proxy_not_running_with_bad_host(self):
-        """ Test if the wrapper can't connect with an invalid toxiproxy server """
+    def test_version_of_invalid_toxiproxy(self):
+        """ Test that we cant fetch the version of an invalid toxiproxy server """
 
         self.toxiproxy.api_server.host = "0.0.0.0"
         self.toxiproxy.api_server.port = 12345
-        self.assertFalse(self.toxiproxy.running())
+        self.assertEqual(self.toxiproxy.version(), None)
 
         self.toxiproxy.api_server.host = "127.0.0.1"
         self.toxiproxy.api_server.port = 8474
