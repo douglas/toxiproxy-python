@@ -4,6 +4,8 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/douglas/toxiproxy-python/badge.svg?branch=master)](https://coveralls.io/github/douglas/toxiproxy-python?branch=master)
 
+[![Code Health](https://landscape.io/github/douglas/toxiproxy-python/master/landscape.svg?style=flat)](https://landscape.io/github/douglas/toxiproxy-python/master)
+
 # toxiproxy-python (Work in Progress)
 
 `toxiproxy-python` `0.x` (latest) is compatible with the Toxiproxy `2.x` series.
