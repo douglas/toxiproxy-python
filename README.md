@@ -1,10 +1,4 @@
-[![Circle CI](https://circleci.com/gh/douglas/toxiproxy-python.svg?style=shield)](https://circleci.com/gh/douglas/toxiproxy-python)
-
-[![Build Status](https://travis-ci.org/douglas/toxiproxy-python.svg?branch=master)](https://travis-ci.org/douglas/toxiproxy-python)
-
-[![Coverage Status](https://coveralls.io/repos/github/douglas/toxiproxy-python/badge.svg?branch=master)](https://coveralls.io/github/douglas/toxiproxy-python?branch=master)
-
-[![Code Health](https://landscape.io/github/douglas/toxiproxy-python/master/landscape.svg?style=flat)](https://landscape.io/github/douglas/toxiproxy-python/master)
+[![Circle CI](https://circleci.com/gh/douglas/toxiproxy-python.svg?style=shield)](https://circleci.com/gh/douglas/toxiproxy-python) [![Build Status](https://travis-ci.org/douglas/toxiproxy-python.svg?branch=master)](https://travis-ci.org/douglas/toxiproxy-python) [![Coverage Status](https://coveralls.io/repos/github/douglas/toxiproxy-python/badge.svg?branch=master)](https://coveralls.io/github/douglas/toxiproxy-python?branch=master) [![Code Health](https://landscape.io/github/douglas/toxiproxy-python/master/landscape.svg?style=flat)](https://landscape.io/github/douglas/toxiproxy-python/master)
 
 # toxiproxy-python (Work in Progress)
 
