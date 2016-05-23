@@ -83,3 +83,33 @@ class Toxiproxy(object):
             return True
         else:
             return False
+
+    def populate(self, proxies):
+        """ Create a list of proxies from an array """
+
+        created_proxies = []
+
+        for proxy in proxies:
+            pass
+
+        # Lets build a dictionary to send the data to the Toxiproxy server
+        json = {
+            "upstream": upstream,
+            "name": name
+        }
+
+        if listen is not None:
+            json["listen"] = listen
+        if enabled is not None:
+            json["enabled"] = enabled
+
+        proxy_info = self.api_server.post("/proxies", json=json).json()
+        proxy_info["api_server"] = self.api_server
+
+        # Lets create a Proxy object to hold all its data
+        proxy = Proxy(**proxy_info)
+
+        # Add the new proxy to the toxiproxy proxies collection
+        self.proxies.update({proxy.name: proxy})
+
+        return proxy

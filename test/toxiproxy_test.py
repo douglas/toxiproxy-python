@@ -147,7 +147,25 @@ class ToxiproxyTest(TestCase):
         pass
 
     def test_populate_creates_proxies_array(self):
-        pass
+        """ Test that we can create proxies from an array of proxies """
+
+        proxies = [
+            {
+                "name": "test_toxiproxy_populate1",
+                "upstream": "localhost:3306",
+                "listen": "localhost:22222"
+            },
+            {
+                "name": "test_toxiproxy_populate2",
+                "upstream": "localhost:3306",
+                "listen": "localhost:22223",
+            },
+        ]
+
+        proxies = self.toxiproxy.populate(proxies)
+
+        for proxy in proxies:
+            self.assert_proxy_available(proxy)
 
     def test_populate_creates_proxies_args(self):
         pass
