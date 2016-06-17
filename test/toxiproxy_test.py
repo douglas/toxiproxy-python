@@ -1,6 +1,6 @@
-from test.test_helper import TestCase
 from past.builtins import basestring
 
+from .test_helper import TestCase
 from toxiproxy.exceptions import ProxyExists
 
 
@@ -166,6 +166,7 @@ class ToxiproxyTest(TestCase):
 
         for proxy in proxies:
             self.assert_proxy_available(proxy)
+            self.assertTrue(self.toxiproxy.destroy(proxy))
 
     def test_populate_creates_proxies_args(self):
         pass
