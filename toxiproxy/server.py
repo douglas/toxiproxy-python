@@ -16,6 +16,7 @@ class Toxiproxy(object):
         """ Toxiproxy constructor """
 
         self.api_server = Intoxicated(server_host, server_port)
+        self.proxies = {}
 
     def get_proxy(self, proxy_name):
         """ Retrive a proxy if it exists """
