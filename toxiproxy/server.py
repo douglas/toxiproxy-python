@@ -16,7 +16,6 @@ class Toxiproxy(object):
         """ Toxiproxy constructor """
 
         self.api_server = Intoxicated(server_host, server_port)
-        self.proxies = {}
 
     def get_proxy(self, proxy_name):
         """ Retrive a proxy if it exists """
@@ -30,9 +29,7 @@ class Toxiproxy(object):
         """ Test if the toxiproxy server is running """
 
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-            is_running = True if sock.connect_ex((self.api_server.host, self.api_server.port)) == 0 else False
-
-        return is_running
+            return bool(sock.connect_ex((self.api_server.host, self.api_server.port)) == 0)
 
     def version(self):
         """ Get the toxiproxy server version """
@@ -87,29 +84,10 @@ class Toxiproxy(object):
     def populate(self, proxies):
         """ Create a list of proxies from an array """
 
-        created_proxies = []
+        proxies_list = []
 
         for proxy in proxies:
-            pass
+            proxy_instance = self.create(**proxy)
+            proxies_list.append(proxy_instance)
 
-        # Lets build a dictionary to send the data to the Toxiproxy server
-        json = {
-            "upstream": upstream,
-            "name": name
-        }
-
-        if listen is not None:
-            json["listen"] = listen
-        if enabled is not None:
-            json["enabled"] = enabled
-
-        proxy_info = self.api_server.post("/proxies", json=json).json()
-        proxy_info["api_server"] = self.api_server
-
-        # Lets create a Proxy object to hold all its data
-        proxy = Proxy(**proxy_info)
-
-        # Add the new proxy to the toxiproxy proxies collection
-        self.proxies.update({proxy.name: proxy})
-
-        return proxy
+        return proxies_list
