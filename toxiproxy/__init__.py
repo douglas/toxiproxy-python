@@ -2,4 +2,4 @@
 # flake8: noqa
 
 from .proxy import Proxy
-from .toxiproxy import Toxiproxy
+from .server import Toxiproxy
