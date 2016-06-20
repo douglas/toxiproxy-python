@@ -30,7 +30,6 @@ setup(
         "requests",
         "pytest",
         "pytest-sugar",
-        "pytest-cov"
     ],
     platforms="Any",
     classifiers=[
