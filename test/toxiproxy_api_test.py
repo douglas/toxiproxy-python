@@ -1,8 +1,9 @@
 from unittest import TestCase
-from toxiproxy.api import validate_response
-from toxiproxy.exceptions import NotFound, ProxyExists
 
 import requests
+
+from toxiproxy.api import validate_response
+from toxiproxy.exceptions import NotFound, ProxyExists
 
 
 class IntoxicatedTest(TestCase):
