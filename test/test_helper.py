@@ -3,6 +3,7 @@
 import socket
 from contextlib import contextmanager
 
+
 @contextmanager
 def tcpserver():
     """ Create a simple TCPServer to allows us to test our wrapper """
@@ -24,4 +25,3 @@ def tcpserver():
 #       connect_to_proxy proxy
 #     end
 #   end
-
