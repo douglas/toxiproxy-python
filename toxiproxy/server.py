@@ -1,12 +1,10 @@
 # coding: utf-8
 
-import socket
-
-from contextlib import closing
-from future.utils import raise_with_traceback
+from future.utils import raise_with_traceback, viewitems, listvalues
 from .api import Intoxicated
 from .proxy import Proxy
 from .exceptions import ProxyExists
+from .utils import test_connection
 
 
 class Toxiproxy(object):
@@ -16,7 +14,28 @@ class Toxiproxy(object):
         """ Toxiproxy constructor """
 
         self.api_server = Intoxicated(server_host, server_port)
+        self.proxies = self.all()
+
+    def all(self):
+        """ Returns all the proxies registered in the server """
+
+        proxies = self.api_server.get("/proxies").json()
         self.proxies = {}
+
+        for name, values in viewitems(proxies):
+            # Lets create a Proxy object to hold all its data
+            values.update({"api_server": self.api_server})
+            proxy = Proxy(**values)
+
+            # Add the new proxy to the toxiproxy proxies collection
+            self.proxies.update({name: proxy})
+
+        return self.proxies
+
+    def destroy_all(self):
+        proxies = listvalues(self.all())
+        for proxy in proxies:
+            self.destroy(proxy)
 
     def get_proxy(self, proxy_name):
         """ Retrive a proxy if it exists """
@@ -29,8 +48,7 @@ class Toxiproxy(object):
     def running(self):
         """ Test if the toxiproxy server is running """
 
-        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-            return bool(sock.connect_ex((self.api_server.host, self.api_server.port)) == 0)
+        return test_connection(self.api_server.host, self.api_server.port)
 
     def version(self):
         """ Get the toxiproxy server version """
@@ -77,7 +95,8 @@ class Toxiproxy(object):
         """ Delete a toxiproxy proxy """
 
         if isinstance(proxy, Proxy) and proxy.destroy() is True:
-            del self.proxies[proxy.name]
+            if proxy.name in self.proxies:
+                del self.proxies[proxy.name]
             return True
         else:
             return False
