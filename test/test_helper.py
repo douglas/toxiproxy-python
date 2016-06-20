@@ -1,28 +1,7 @@
 # coding: utf-8
 
-import unittest
 import socket
-
 from contextlib import contextmanager
-from toxiproxy import Toxiproxy
-
-
-class TestCase(unittest.TestCase):
-    def setUp(self):
-        self.toxiproxy = Toxiproxy()
-
-    def tearDown(self):
-        pass
-
-    def assert_proxy_available(self, proxy):
-        pass
-
-    def assert_proxy_unavailable(self, proxy):
-        pass
-
-    def connect_to_proxy(self, proxy):
-        pass
-
 
 @contextmanager
 def tcpserver():
@@ -38,3 +17,11 @@ def tcpserver():
         yield server
     finally:
         server.close()
+
+
+#   def assert_proxy_unavailable(proxy)
+#     assert_raises Errno::ECONNREFUSED do
+#       connect_to_proxy proxy
+#     end
+#   end
+
