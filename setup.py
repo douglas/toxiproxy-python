@@ -22,9 +22,15 @@ setup(
         "requests"
     ],
     test_suite="test",
+    setup_requires=[
+        "pytest-runner"
+    ],
     tests_require=[
         "future",
-        "requests"
+        "requests",
+        "pytest",
+        "pytest-sugar",
+        "pytest-cov"
     ],
     platforms="Any",
     classifiers=[
