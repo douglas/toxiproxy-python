@@ -60,3 +60,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# Ignoring for now
+CHANGELOG
+toxiproxy-ruby
