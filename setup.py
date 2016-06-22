@@ -23,11 +23,10 @@ setup(
     ],
     test_suite="test",
     setup_requires=[
+        "pytest",
         "pytest-runner"
     ],
     tests_require=[
-        "future",
-        "requests",
         "pytest",
         "pytest-sugar",
     ],
