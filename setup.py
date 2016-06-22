@@ -23,12 +23,12 @@ setup(
     ],
     test_suite="test",
     setup_requires=[
-        "pytest",
-        "pytest-runner"
+        "pytest-runner",
+        "pytest"
     ],
     tests_require=[
-        "pytest",
         "pytest-sugar",
+        "pytest"
     ],
     platforms="Any",
     classifiers=[
