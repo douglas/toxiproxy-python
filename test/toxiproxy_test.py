@@ -93,6 +93,15 @@ def test_version_of_invalid_toxiproxy():
     toxiproxy.api_server.host = "127.0.0.1"
     toxiproxy.api_server.port = 8474
 
+def test_proxy_not_running_with_bad_host():
+    toxiproxy.api_server.host = "0.0.0.0"
+    toxiproxy.api_server.port = 12345
+    assert toxiproxy.running() is False
+
+    # Restoring the defaults
+    toxiproxy.api_server.host = "127.0.0.1"
+    toxiproxy.api_server.port = 8474
+
 def test_populate_creates_proxies_array():
     """ Test that we can create proxies from an array of proxies """
 
