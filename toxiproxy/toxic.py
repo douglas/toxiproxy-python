@@ -31,6 +31,6 @@ class Toxic(object):
             "attributes": self.attributes,
         }
 
-        proxy_info = self.api_server.post("/proxies/%s/toxics" % self.proxy.name, json=json).json()
+        self.api_server.post("/proxies/%s/toxics" % self.proxy.name, json=json).json()
 
         return True
