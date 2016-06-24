@@ -8,10 +8,12 @@ from toxiproxy import Toxiproxy
 # The toxiproxy server we will use for the tests
 toxiproxy = Toxiproxy()
 
+
 def teardown_function(function):
     """ Lets cler all the created proxies during the tests """
 
     toxiproxy.destroy_all()
+
 
 def test_create_proxy():
     """ Test if we can create proxies """
@@ -28,6 +30,7 @@ def test_create_proxy():
     assert proxy.enabled is False
     assert proxy.listen == "127.0.0.1:43215"
 
+
 def test_destroy_proxy():
     """ Test if we can destroy proxies """
 
@@ -35,11 +38,13 @@ def test_destroy_proxy():
     toxiproxy.destroy("test_mysql_master")
     assert proxy not in toxiproxy.proxies
 
+
 def test_destroy_invalid_proxy():
     """ Test if we can destroy an invalid proxy """
 
     result = toxiproxy.destroy("invalid_proxy")
     assert result is False
+
 
 def test_disable_proxy():
     """ Test if we can disable proxies """
@@ -48,6 +53,7 @@ def test_disable_proxy():
     proxy.disable()
 
     assert proxy.enabled is False
+
 
 def test_enable_proxy():
     """ Test if we can enable a proxy """
@@ -58,11 +64,13 @@ def test_enable_proxy():
 
     assert proxy.enabled is True
 
+
 def test_find_invalid_proxy():
     """ Test if that we cant fetch an invalid proxy """
 
     proxy = toxiproxy.get_proxy("invalid_proxy")
     assert proxy is None
+
 
 def test_create_and_find_proxy():
     """ Test if we can create a proxy and retrieve it """
@@ -73,6 +81,7 @@ def test_create_and_find_proxy():
     assert proxy.upstream == "localhost:3306"
     assert proxy.name == "test_mysql_master"
 
+
 def test_cant_create_proxies_same_name():
     """ Test that we can't create proxies with the same name """
 
@@ -81,6 +90,7 @@ def test_cant_create_proxies_same_name():
     with pytest.raises(ProxyExists) as context:
         toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
         assert "This proxy already exists." in context.exception
+
 
 def test_version_of_invalid_toxiproxy():
     """ Test that we cant fetch the version of an invalid toxiproxy server """
@@ -93,6 +103,7 @@ def test_version_of_invalid_toxiproxy():
     toxiproxy.api_server.host = "127.0.0.1"
     toxiproxy.api_server.port = 8474
 
+
 def test_proxy_not_running_with_bad_host():
     toxiproxy.api_server.host = "0.0.0.0"
     toxiproxy.api_server.port = 12345
@@ -101,6 +112,7 @@ def test_proxy_not_running_with_bad_host():
     # Restoring the defaults
     toxiproxy.api_server.host = "127.0.0.1"
     toxiproxy.api_server.port = 8474
+
 
 def test_populate_creates_proxies_array():
     """ Test that we can create proxies from an array of proxies """
@@ -128,10 +140,12 @@ def test_populate_creates_proxies_array():
         host, port = proxy.listen.split(":")
         assert test_connection(host, int(port)) is True
 
+
 def test_running_helper():
     """ Test if the wrapper can connect with a valid toxiproxy server """
 
     assert toxiproxy.running() is True
+
 
 def test_version():
     """ Test if the version is an instance of a string type """
