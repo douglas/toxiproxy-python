@@ -64,3 +64,5 @@ docs/_build/
 # Ignoring for now
 CHANGELOG
 toxiproxy-ruby
+bin/toxiproxy-server
+nohup.out

@@ -6,32 +6,32 @@ from future.utils import raise_with_traceback
 from .exceptions import ProxyExists, NotFound, InvalidToxic
 
 
-class Intoxicated(object):
+class APIConsumer(object):
     """ Toxiproxy API Consumer """
 
-    def __init__(self, host, port):
-        """ """
+    host = "127.0.0.1"
+    port = 8474
+    base_url = "http://%s:%s" % (host, port)
 
-        self.host = host
-        self.port = port
-        self.base_url = "http://%s:%s" % (host, port)
-
-    def get(self, url, params=None, **kwargs):
+    @classmethod
+    def get(cls, url, params=None, **kwargs):
         """ Use the GET method to fetch data from the API """
 
-        endpoint = self.base_url + url
+        endpoint = cls.base_url + url
         return validate_response(requests.get(url=endpoint, params=params, **kwargs))
 
-    def delete(self, url, **kwargs):
+    @classmethod
+    def delete(cls, url, **kwargs):
         """ Use the DELETE method to delete data from the API """
 
-        endpoint = self.base_url + url
+        endpoint = cls.base_url + url
         return validate_response(requests.delete(url=endpoint, **kwargs))
 
-    def post(self, url, data=None, json=None, **kwargs):
+    @classmethod
+    def post(cls, url, data=None, json=None, **kwargs):
         """ Use the POST method to post data to the API """
 
-        endpoint = self.base_url + url
+        endpoint = cls.base_url + url
         return validate_response(requests.post(url=endpoint, data=data, json=json, **kwargs))
 
 

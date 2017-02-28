@@ -4,6 +4,10 @@ import pytest
 
 from toxiproxy.exceptions import ProxyExists
 from toxiproxy import Toxiproxy
+from toxiproxy.utils import can_connect_to
+
+from .test_utils import tcp_server
+
 
 # The toxiproxy server we will use for the tests
 toxiproxy = Toxiproxy()
@@ -36,7 +40,7 @@ def test_destroy_proxy():
 
     proxy = toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
     toxiproxy.destroy("test_mysql_master")
-    assert proxy not in toxiproxy.proxies
+    assert proxy not in toxiproxy.proxies()
 
 
 def test_destroy_invalid_proxy():
@@ -95,31 +99,23 @@ def test_cant_create_proxies_same_name():
 def test_version_of_invalid_toxiproxy():
     """ Test that we cant fetch the version of an invalid toxiproxy server """
 
-    toxiproxy.api_server.host = "0.0.0.0"
-    toxiproxy.api_server.port = 12345
+    toxiproxy.update_api_consumer("0.0.0.0", 12345)
     assert toxiproxy.version() is None
 
     # Restoring the defaults
-    toxiproxy.api_server.host = "127.0.0.1"
-    toxiproxy.api_server.port = 8474
+    toxiproxy.update_api_consumer("127.0.0.1", 8474)
 
 
 def test_proxy_not_running_with_bad_host():
-    toxiproxy.api_server.host = "0.0.0.0"
-    toxiproxy.api_server.port = 12345
+    toxiproxy.update_api_consumer("0.0.0.0", 12345)
     assert toxiproxy.running() is False
 
     # Restoring the defaults
-    toxiproxy.api_server.host = "127.0.0.1"
-    toxiproxy.api_server.port = 8474
+    toxiproxy.update_api_consumer("127.0.0.1", 8474)
 
 
 def test_populate_creates_proxies_array():
     """ Test that we can create proxies from an array of proxies """
-
-    # Importing it here to avoid pytest trying to
-    # run it as a test
-    from toxiproxy.utils import test_connection
 
     proxies = [
         {
@@ -138,7 +134,7 @@ def test_populate_creates_proxies_array():
 
     for proxy in proxies:
         host, port = proxy.listen.split(":")
-        assert test_connection(host, int(port)) is True
+        assert can_connect_to(host, int(port)) is True
 
 
 def test_running_helper():
@@ -153,8 +149,28 @@ def test_version():
     assert isinstance(toxiproxy.version(), basestring)
 
 
-#     def test_enable_and_disable_proxy_with_toxic(self):
-#         pass
+def test_enable_and_disable_proxy_with_toxic():
+    """ Test if we can enable and disable a proxy with toxic """
+
+    with tcp_server() as server:
+        port = server.server_address[1]
+
+        proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_rubby_server")
+        listen_addr = proxy.listen
+
+        proxy.add_toxic(type="latency", attributes={"latency": 123})
+
+        proxy.disable()
+        assert proxy.enabled is False
+
+        proxy.enable()
+        assert proxy.enabled is True
+
+        latency_toxic = proxy.get_toxic("latency_downstream")
+        assert latency_toxic.attributes['latency'] == 123
+
+        assert listen_addr == proxy.listen
+
 
 #     def test_delete_toxic(self):
 #         pass
@@ -204,11 +220,28 @@ def test_version():
 #     def test_apply_toxics_to_collection(self):
 #         pass
 
-#     def test_populate_creates_proxies_args(self):
-#         pass
+def test_populate_creates_proxies_update_listen():
+    """ Create proxies and tests if they are available """
 
-#     def test_populate_creates_proxies_update_listen(self):
-#         pass
+    proxies = [{
+        "name": "test_toxiproxy_populate1",
+        "upstream": "localhost:3306",
+        "listen": "localhost:22222",
+    }]
+
+    proxies = toxiproxy.populate(proxies)
+
+    proxies = [{
+        "name": "test_toxiproxy_populate1",
+        "upstream": "localhost:3306",
+        "listen": "localhost:22223",
+    }]
+
+    proxies = toxiproxy.populate(proxies)
+
+    for proxy in proxies:
+        host, port = proxy.listen.split(":")
+        assert can_connect_to(host, int(port)) is True
 
 #     def test_populate_creates_proxies_update_upstream(self):
 #         pass
