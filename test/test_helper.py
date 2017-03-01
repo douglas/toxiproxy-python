@@ -12,9 +12,8 @@ class TCPHandler(socketserver.BaseRequestHandler):
     """
 
     def handle(self):
-        # self.request is the TCP socket connected to the client
         self.data = self.request.recv(1024).strip()
-        print("%s wrote: %s" % (self.client_address[0], self.data))
+        #print("%s wrote: %s" % (self.client_address[0], self.data))
         if self.data == bytes(b"omg"):
             self.request.sendall(bytes(b"omgs"))
 
@@ -39,4 +38,4 @@ def connect_to_proxy(proxy):
         sock.connect((host, int(port)))
         sock.sendall(bytes(b"omg"))
         response = sock.recv(1024)
-        print("Received: {}".format(response))
+        #print("Received: {}".format(response))
