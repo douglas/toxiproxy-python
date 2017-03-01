@@ -6,7 +6,7 @@ from toxiproxy.exceptions import ProxyExists
 from toxiproxy import Toxiproxy
 from toxiproxy.utils import can_connect_to
 
-from .test_utils import tcp_server
+from .test_helper import tcp_server
 
 
 # The toxiproxy server we will use for the tests
