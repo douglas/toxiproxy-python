@@ -28,7 +28,9 @@ setup(
     ],
     tests_require=[
         "pytest-sugar",
-        "pytest"
+        "pytest",
+        "ipdb",
+        "profilehooks"
     ],
     platforms="Any",
     classifiers=[
