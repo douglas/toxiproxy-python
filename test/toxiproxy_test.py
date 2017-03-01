@@ -272,6 +272,18 @@ def test_invalid_direction():
         assert excinfo.typename == "InvalidToxic"
 
 
+def test_multiple_of_same_toxic_type():
+    with tcp_server() as port:
+        proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_proxy")
+        proxy_host, proxy_port = proxy.listen.split(":")
+        proxy.add_toxic(type="latency", attributes={"latency": 100})
+        proxy.add_toxic(type="latency", attributes={"latency": 100}, name="second_latency_downstream")
+
+        before = time.time()
+        connect_to_proxy(proxy_host, proxy_port)
+        passed = time.time() - before
+
+        assert passed, pytest.approx(0.200, 0.01)
 
 #     def test_take_endpoint_down(self):
 #         pass
@@ -312,11 +324,5 @@ def test_invalid_direction():
 #     def test_populate_creates_proxies_update_upstream(self):
 #         pass
 
-#     def test_multiple_of_same_toxic_type(self):
-#         pass
-
 #     def test_multiple_of_same_toxic_type_with_same_name(self):
-#         pass
-
-#     def test_invalid_direction(self):
 #         pass
