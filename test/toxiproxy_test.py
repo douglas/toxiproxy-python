@@ -196,8 +196,49 @@ def test_delete_toxic():
         assert listen_addr == proxy.listen
 
 
-#     def test_reset(self):
-#         pass
+def test_reset():
+    """ Test the reset Toxiproxy feature """
+
+    with tcp_server() as server:
+        port = server.server_address[1]
+
+        proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_rubby_server")
+        proxy_host, proxy_port = proxy.listen.split(":")
+        listen_addr = proxy.listen
+
+        proxy.disable()
+        assert can_connect_to(proxy_host, int(proxy_port)) is False
+
+        proxy.add_toxic(type="latency", attributes={"latency": 123})
+
+        toxiproxy.reset()
+        assert can_connect_to(proxy_host, int(proxy_port)) is True
+        assert proxy.toxics() == {}
+        assert listen_addr == proxy.listen
+
+
+def test_populate_creates_proxies_update_listen():
+    """ Create proxies and tests if they are available """
+
+    proxies = [{
+        "name": "test_toxiproxy_populate1",
+        "upstream": "localhost:3306",
+        "listen": "localhost:22222",
+    }]
+
+    proxies = toxiproxy.populate(proxies)
+
+    proxies = [{
+        "name": "test_toxiproxy_populate1",
+        "upstream": "localhost:3306",
+        "listen": "localhost:22223",
+    }]
+
+    proxies = toxiproxy.populate(proxies)
+
+    for proxy in proxies:
+        host, port = proxy.listen.split(":")
+        assert can_connect_to(host, int(port)) is True
 
 #     def test_take_endpoint_down(self):
 #         pass
@@ -240,29 +281,6 @@ def test_delete_toxic():
 
 #     def test_apply_toxics_to_collection(self):
 #         pass
-
-def test_populate_creates_proxies_update_listen():
-    """ Create proxies and tests if they are available """
-
-    proxies = [{
-        "name": "test_toxiproxy_populate1",
-        "upstream": "localhost:3306",
-        "listen": "localhost:22222",
-    }]
-
-    proxies = toxiproxy.populate(proxies)
-
-    proxies = [{
-        "name": "test_toxiproxy_populate1",
-        "upstream": "localhost:3306",
-        "listen": "localhost:22223",
-    }]
-
-    proxies = toxiproxy.populate(proxies)
-
-    for proxy in proxies:
-        host, port = proxy.listen.split(":")
-        assert can_connect_to(host, int(port)) is True
 
 #     def test_populate_creates_proxies_update_upstream(self):
 #         pass
