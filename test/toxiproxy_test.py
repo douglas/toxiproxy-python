@@ -1,13 +1,15 @@
-from past.builtins import basestring
+# coding: utf-8
 
+import time
 import pytest
+
+from past.builtins import basestring
 
 from toxiproxy.exceptions import ProxyExists
 from toxiproxy import Toxiproxy
 from toxiproxy.utils import can_connect_to
 
-from .test_helper import tcp_server
-
+from .test_helper import tcp_server, connect_to_proxy
 
 # The toxiproxy server we will use for the tests
 toxiproxy = Toxiproxy()
@@ -152,9 +154,7 @@ def test_version():
 def test_enable_and_disable_proxy_with_toxic():
     """ Test if we can enable and disable a proxy with toxic """
 
-    with tcp_server() as server:
-        port = server.server_address[1]
-
+    with tcp_server() as port:
         proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_rubby_server")
         proxy_host, proxy_port = proxy.listen.split(":")
         listen_addr = proxy.listen
@@ -176,9 +176,7 @@ def test_enable_and_disable_proxy_with_toxic():
 def test_delete_toxic():
     """ Test if we can delete a toxic """
 
-    with tcp_server() as server:
-        port = server.server_address[1]
-
+    with tcp_server() as port:
         proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_rubby_server")
         proxy_host, proxy_port = proxy.listen.split(":")
         listen_addr = proxy.listen
@@ -199,9 +197,7 @@ def test_delete_toxic():
 def test_reset():
     """ Test the reset Toxiproxy feature """
 
-    with tcp_server() as server:
-        port = server.server_address[1]
-
+    with tcp_server() as port:
         proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_rubby_server")
         proxy_host, proxy_port = proxy.listen.split(":")
         listen_addr = proxy.listen
@@ -240,6 +236,33 @@ def test_populate_creates_proxies_update_listen():
         host, port = proxy.listen.split(":")
         assert can_connect_to(host, int(port)) is True
 
+
+def test_apply_upstream_toxic():
+    with tcp_server() as port:
+        proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_proxy")
+        proxy_host, proxy_port = proxy.listen.split(":")
+        proxy.add_toxic(stream="upstream", type="latency", attributes={"latency": 100})
+
+        before = time.time()
+        connect_to_proxy(proxy_host, proxy_port)
+        passed = time.time() - before
+
+        assert passed, pytest.approx(0.100, 0.01)
+
+
+def test_apply_downstream_toxic():
+    with tcp_server() as port:
+        proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_proxy")
+        proxy_host, proxy_port = proxy.listen.split(":")
+        proxy.add_toxic(type="latency", attributes={"latency": 100})
+
+        before = time.time()
+        connect_to_proxy(proxy_host, proxy_port)
+        passed = time.time() - before
+
+        assert passed, pytest.approx(0.100, 0.01)
+
+
 #     def test_take_endpoint_down(self):
 #         pass
 
@@ -262,12 +285,6 @@ def test_populate_creates_proxies_update_listen():
 #         pass
 
 #     def test_indexing_allows_regexp(self):
-#         pass
-
-#     def test_apply_upstream_toxic(self):
-#         pass
-
-#     def test_apply_downstream_toxic(self):
 #         pass
 
 #     def test_toxic_applies_a_downstream_toxic(self):
