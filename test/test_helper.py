@@ -2,40 +2,42 @@ import socket
 import threading
 import socketserver
 
-from contextlib import closing, contextmanager
+from contextlib import contextmanager
 from builtins import bytes
 
 
-class TCPHandler(socketserver.BaseRequestHandler):
+class TCPRequestHandler(socketserver.StreamRequestHandler):
     """
     The request handler class for our server.
     """
 
     def handle(self):
-        self.data = self.request.recv(1024).strip()
-        #print("%s wrote: %s" % (self.client_address[0], self.data))
-        if self.data == bytes(b"omg"):
-            self.request.sendall(bytes(b"omgs"))
+        data = self.rfile.readline().strip()
+        if data:
+            self.wfile.write(bytes(b"omgs\n"))
 
 
 @contextmanager
 def tcp_server():
-    server = socketserver.TCPServer(("127.0.0.1", 0), RequestHandlerClass=TCPHandler)
+    server = socketserver.TCPServer(("127.0.0.1", 0), RequestHandlerClass=TCPRequestHandler)
+    port = server.server_address[1]
 
-    thread = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.01})
-    thread.daemon = True
+    thread = threading.Thread(target=server.serve_forever)
 
     try:
         thread.start()
-        yield server
+        yield port
     finally:
         server.shutdown()
 
 
-def connect_to_proxy(proxy):
-    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-        host, port = proxy.listen.split(":")
-        sock.connect((host, int(port)))
-        sock.sendall(bytes(b"omg"))
-        response = sock.recv(1024)
-        #print("Received: {}".format(response))
+def connect_to_proxy(host, port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    sock.connect((host, int(port)))
+
+    try:
+        sock.sendall(bytes(b"omg\n"))
+        sock.recv(1024)
+    finally:
+        sock.close()
