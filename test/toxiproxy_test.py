@@ -156,15 +156,16 @@ def test_enable_and_disable_proxy_with_toxic():
         port = server.server_address[1]
 
         proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_rubby_server")
+        proxy_host, proxy_port = proxy.listen.split(":")
         listen_addr = proxy.listen
 
         proxy.add_toxic(type="latency", attributes={"latency": 123})
 
         proxy.disable()
-        assert proxy.enabled is False
+        assert can_connect_to(proxy_host, int(proxy_port)) is False
 
         proxy.enable()
-        assert proxy.enabled is True
+        assert can_connect_to(proxy_host, int(proxy_port)) is True
 
         latency_toxic = proxy.get_toxic("latency_downstream")
         assert latency_toxic.attributes['latency'] == 123
@@ -172,8 +173,28 @@ def test_enable_and_disable_proxy_with_toxic():
         assert listen_addr == proxy.listen
 
 
-#     def test_delete_toxic(self):
-#         pass
+def test_delete_toxic():
+    """ Test if we can delete a toxic """
+
+    with tcp_server() as server:
+        port = server.server_address[1]
+
+        proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_rubby_server")
+        proxy_host, proxy_port = proxy.listen.split(":")
+        listen_addr = proxy.listen
+
+        proxy.add_toxic(type="latency", attributes={"latency": 123})
+
+        assert can_connect_to(proxy_host, int(proxy_port)) is True
+
+        latency_toxic = proxy.get_toxic("latency_downstream")
+        assert latency_toxic.attributes['latency'] == 123
+
+        proxy.destroy_toxic("latency_downstream")
+        assert proxy.toxics() == {}
+
+        assert listen_addr == proxy.listen
+
 
 #     def test_reset(self):
 #         pass
