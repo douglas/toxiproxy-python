@@ -5,7 +5,7 @@ import pytest
 
 from past.builtins import basestring
 
-from toxiproxy.exceptions import ProxyExists
+from toxiproxy.exceptions import ProxyExists, InvalidToxic
 from toxiproxy import Toxiproxy
 from toxiproxy.utils import can_connect_to
 
@@ -93,9 +93,9 @@ def test_cant_create_proxies_same_name():
 
     toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
 
-    with pytest.raises(ProxyExists) as context:
+    with pytest.raises(ProxyExists) as excinfo:
         toxiproxy.create(upstream="localhost:3306", name="test_mysql_master")
-        assert "This proxy already exists." in context.exception
+    assert excinfo.typename == "ProxyExists"
 
 
 def test_version_of_invalid_toxiproxy():
@@ -261,6 +261,16 @@ def test_apply_downstream_toxic():
         passed = time.time() - before
 
         assert passed, pytest.approx(0.100, 0.01)
+
+
+def test_invalid_direction():
+    with tcp_server() as port:
+        proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_rubby_server")
+
+        with pytest.raises(InvalidToxic) as excinfo:
+            proxy.add_toxic(type="latency", attributes={"latency": 123}, stream="lolstream")
+        assert excinfo.typename == "InvalidToxic"
+
 
 
 #     def test_take_endpoint_down(self):
