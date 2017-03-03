@@ -2,6 +2,7 @@
 
 from .api import APIConsumer
 from .toxic import Toxic
+from contextlib import contextmanager
 
 
 class Proxy(object):
@@ -13,6 +14,16 @@ class Proxy(object):
         self.upstream = kwargs["upstream"]
         self.enabled = kwargs["enabled"]
         self.listen = kwargs["listen"]
+
+    @contextmanager
+    def down(self):
+        """ Takes the proxy down while in the context """
+
+        try:
+            self.disable()
+            yield self
+        finally:
+            self.enable()
 
     def toxics(self):
         """ Returns all toxics tied to the proxy """
