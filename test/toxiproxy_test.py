@@ -238,6 +238,8 @@ def test_populate_creates_proxies_update_listen():
 
 
 def test_apply_upstream_toxic():
+    """ Test that is possible to create upstream toxics """
+
     with tcp_server() as port:
         proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_proxy")
         proxy_host, proxy_port = proxy.listen.split(":")
@@ -251,6 +253,8 @@ def test_apply_upstream_toxic():
 
 
 def test_apply_downstream_toxic():
+    """ Test that is possible to create downstream toxics """
+
     with tcp_server() as port:
         proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_proxy")
         proxy_host, proxy_port = proxy.listen.split(":")
@@ -264,6 +268,8 @@ def test_apply_downstream_toxic():
 
 
 def test_invalid_direction():
+    """ Test that is not possible to create toxics with invalid direction """
+
     with tcp_server() as port:
         proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_rubby_server")
 
@@ -273,6 +279,8 @@ def test_invalid_direction():
 
 
 def test_multiple_of_same_toxic_type():
+    """ Test that is possible to create various toxics with the same type """
+
     with tcp_server() as port:
         proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_proxy")
         proxy_host, proxy_port = proxy.listen.split(":")
@@ -285,8 +293,21 @@ def test_multiple_of_same_toxic_type():
 
         assert passed, pytest.approx(0.200, 0.01)
 
-#     def test_take_endpoint_down(self):
-#         pass
+
+def test_take_endpoint_down():
+    """ Test that is possible to take the endpoint down inside a context """
+
+    with tcp_server() as port:
+        proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_rubby_server")
+        proxy_host, proxy_port = proxy.listen.split(":")
+        listen_addr = proxy.listen
+
+        with proxy.down():
+            assert can_connect_to(proxy_host, int(proxy_port)) is False
+
+        assert can_connect_to(proxy_host, int(proxy_port)) is True
+        assert listen_addr == proxy.listen
+
 
 #     def test_raises_when_proxy_doesnt_exist(self):
 #         pass
