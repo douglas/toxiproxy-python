@@ -1,6 +1,5 @@
 # coding: utf-8
 
-import time
 import pytest
 
 from past.builtins import basestring
@@ -245,10 +244,7 @@ def test_apply_upstream_toxic():
         proxy_host, proxy_port = proxy.listen.split(":")
         proxy.add_toxic(stream="upstream", type="latency", attributes={"latency": 100})
 
-        before = time.time()
-        connect_to_proxy(proxy_host, proxy_port)
-        passed = time.time() - before
-
+        passed = connect_to_proxy(proxy_host, proxy_port)
         assert passed, pytest.approx(0.100, 0.01)
 
 
@@ -260,10 +256,7 @@ def test_apply_downstream_toxic():
         proxy_host, proxy_port = proxy.listen.split(":")
         proxy.add_toxic(type="latency", attributes={"latency": 100})
 
-        before = time.time()
-        connect_to_proxy(proxy_host, proxy_port)
-        passed = time.time() - before
-
+        passed = connect_to_proxy(proxy_host, proxy_port)
         assert passed, pytest.approx(0.100, 0.01)
 
 
@@ -287,10 +280,7 @@ def test_multiple_of_same_toxic_type():
         proxy.add_toxic(type="latency", attributes={"latency": 100})
         proxy.add_toxic(type="latency", attributes={"latency": 100}, name="second_latency_downstream")
 
-        before = time.time()
-        connect_to_proxy(proxy_host, proxy_port)
-        passed = time.time() - before
-
+        passed = connect_to_proxy(proxy_host, proxy_port)
         assert passed, pytest.approx(0.200, 0.01)
 
 
@@ -308,6 +298,18 @@ def test_take_endpoint_down():
         assert can_connect_to(proxy_host, int(proxy_port)) is True
         assert listen_addr == proxy.listen
 
+
+def test_apply_prolong_toxics():
+    """ Test that is possible to prolong toxics """
+
+    with tcp_server() as port:
+        proxy = toxiproxy.create(upstream="localhost:%s" % port, name="test_proxy")
+        proxy_host, proxy_port = proxy.listen.split(":")
+        proxy.add_toxic(stream="upstream", type="latency", attributes={"latency": 100})
+        proxy.add_toxic(type="latency", attributes={"latency": 100})
+
+        passed = connect_to_proxy(proxy_host, proxy_port)
+        assert passed, pytest.approx(0.200, 0.01)
 
 #     def test_raises_when_proxy_doesnt_exist(self):
 #         pass
