@@ -1,8 +1,9 @@
 # coding: utf-8
 
+from contextlib import contextmanager
+
 from .api import APIConsumer
 from .toxic import Toxic
-from contextlib import contextmanager
 
 
 class Proxy(object):
