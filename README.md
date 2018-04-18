@@ -11,7 +11,7 @@ can use the Python library, you need to read the [Usage section of the Toxiproxy
 README](https://github.com/shopify/toxiproxy#usage).
 
 ```
-pip install toxiproxy
+pip install git+https://github.com/douglas/toxiproxy-python.git
 ```
 
 Make sure the Toxiproxy server is already running.
