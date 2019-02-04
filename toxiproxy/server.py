@@ -116,3 +116,4 @@ class Toxiproxy(object):
 
         APIConsumer.host = host
         APIConsumer.port = port
+        APIConsumer.base_url = "http://%s:%s" % (host, port)
