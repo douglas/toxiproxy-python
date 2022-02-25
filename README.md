@@ -1,4 +1,4 @@
-[![Circle CI](https://circleci.com/gh/douglas/toxiproxy-python.svg?style=shield)](https://circleci.com/gh/douglas/toxiproxy-python) [![Build Status](https://travis-ci.org/douglas/toxiproxy-python.svg?branch=master)](https://travis-ci.org/douglas/toxiproxy-python) [![Coverage Status](https://coveralls.io/repos/github/douglas/toxiproxy-python/badge.svg?branch=master)](https://coveralls.io/github/douglas/toxiproxy-python?branch=master) [![Code Health](https://landscape.io/github/douglas/toxiproxy-python/master/landscape.svg?style=flat)](https://landscape.io/github/douglas/toxiproxy-python/master)
+[![Circle CI](https://circleci.com/gh/douglas/toxiproxy-python.svg?style=shield)](https://circleci.com/gh/douglas/toxiproxy-python) [![Build Status](https://travis-ci.org/douglas/toxiproxy-python.svg?branch=master)](https://travis-ci.org/douglas/toxiproxy-python) [![Coverage Status](https://coveralls.io/repos/github/douglas/toxiproxy-python/badge.svg?branch=master)](https://coveralls.io/github/douglas/toxiproxy-python?branch=master)
 
 # toxiproxy-python (Work in Progress)
 
@@ -22,60 +22,74 @@ documentation](https://github.com/shopify/toxiproxy)
 ## Usage (what we want to achieve when this library is ready)
 
 The Python client communicates with the Toxiproxy daemon via HTTP. By default it
-connects to `http://127.0.0.1:8474`, but you can point to any host:
+connects to `http://127.0.0.1:8474`. you can create multiple proxies:
 
-```
-to be ported =(
-```
+```python
+import toxiproxy
 
-For example, to simulate 1000ms latency on a database server you can use the
-`latency` toxic with the `latency` argument (see the Toxiproxy project for a
-list of all toxics):
-
-```
-to be ported =(
-```
-
-You can also take an endpoint down for the duration of a block at the TCP level:
-
-```
-to be ported =(
-```
-
-If you want to simulate all your Redis instances being down:
-
-```
-to be ported =(
-```
-
-If you want to simulate that your cache server is slow at incoming network
-(upstream), but fast at outgoing (downstream), you can apply a toxic to just the
-upstream:
-
-```
-to be ported =(
+server = toxiproxy.Toxiproxy()
+# To populate Toxiproxy pass the proxy configurations to
+# the populate method. This will create the proxies passed,
+# or replace the proxies if they already exist in
+# Toxiproxy. It's recommended to do this early as early
+# in boot as possible, see the Toxiproxy README. If you
+# have many proxies, we recommend storing the Toxiproxy
+# configs in a configuration file and deserializing it
+# into populate.
+proxies = server.populate([{
+    "name": "proxy1",
+    "listen": f"127.0.0.1:5000",
+    "upstream": f"127.0.0.1:50001"
+}, {
+    "name": "proxy2",
+    "listen": f"127.0.0.1:6000",
+    "upstream": f"127.0.0.1:60001"
+}])
 ```
 
-By default the toxic is applied to the downstream connection, you can be
-explicit and chain them:
+For example:
+```python
+import toxiproxy
 
-```
-to be ported =(
+server = toxiproxy.Toxiproxy()
+proxies = server.populate([{
+    "name": "proxy1",
+    "listen": f"127.0.0.1:5000",
+    "upstream": f"127.0.0.1:50001"
+}, {
+    "name": "proxy2",
+    "listen": f"127.0.0.1:6000",
+    "upstream": f"127.0.0.1:60001"
+}])
+
+# You can use the latency toxic with the latency argument
+proxies[0].add_toxic(name="latency_toxics",
+                     type="latency",
+                     attributes={
+                         "latency": 1000,  # 1000ms
+                         "jitter": 0
+                     })
+
+# You can also take an endpoint down for the duration of
+# a block at the TCP level:
+proxies[1].disable()  # down
+# do something
+proxies[1].enable()  # up
+
+# Remove a toxic
+proxies[0].destroy_toxic("latency_toxics")
+
+# Destroy a proxy
+proxies[0].destroy()
+proxies[1].destroy()
+# or destroy all proxies
+server.destroy_all()
+
+# Get all proxies
+proxies = server.proxies()
+# Get a proxy by name
+proxy1 = server.get_proxy("proxy1")
 ```
 
 See the [Toxiproxy README](https://github.com/shopify/toxiproxy#Toxics) for a
 list of toxics.
-
-## Populate
-
-To populate Toxiproxy pass the proxy configurations to the `populate` method:
-
-```
-to be ported =(
-```
-
-This will create the proxies passed, or replace the proxies if they already exist in Toxiproxy.
-It's recommended to do this early as early in boot as possible, see the
-[Toxiproxy README](https://github.com/shopify/toxiproxy#Usage). If you have many
-proxies, we recommend storing the Toxiproxy configs in a configuration file and
-deserializing it into `populate`.
